@@ -15,6 +15,15 @@ public class Note {
 	private LocalDateTime updatedAt;
 	private String content;
 	
+	public Note(String patientId, String doctorId, LocalDateTime createdAt,
+			LocalDateTime updatedAt, String content) {
+		this.patientId = patientId;
+		this.doctorId = doctorId;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+		this.content = content;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -57,5 +66,16 @@ public class Note {
 	
 	public void setContent(String content) {
 		this.content = content;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder string = new StringBuilder()
+				.append("patientId: ")
+				.append(this.patientId)
+				.append(" - creation date: ")
+				.append(this.createdAt);
+			
+				return string.toString();
 	}
 }
