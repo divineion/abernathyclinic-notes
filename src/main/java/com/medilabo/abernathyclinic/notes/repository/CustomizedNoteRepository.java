@@ -7,5 +7,5 @@ import com.medilabo.abernathyclinic.notes.entity.Note;
 import reactor.core.publisher.Mono;
 
 public interface CustomizedNoteRepository {
-	Mono<Note> findByPatientIdAndCreatedAt(String patientId, LocalDateTime createdAt);	
+	Mono<Note> findByPatientUuidAndCreatedAt(String patientUuid, LocalDateTime createdAt);	
 }

@@ -9,15 +9,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Note {
 	@Id
 	private String id;
-	private String patientId;
+	private String patientUuid;
 	private String doctorId;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private String content;
 	
-	public Note(String patientId, String doctorId, LocalDateTime createdAt,
+	public Note(String patientUuid, String doctorId, LocalDateTime createdAt,
 			LocalDateTime updatedAt, String content) {
-		this.patientId = patientId;
+		this.patientUuid = patientUuid;
 		this.doctorId = doctorId;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -28,12 +28,12 @@ public class Note {
 		return id;
 	}
 	
-	public String getPatientId() {
-		return patientId;
+	public String getPatientUuid() {
+		return patientUuid;
 	}
 	
-	public void setPatientId(String patientId) {
-		this.patientId = patientId;
+	public void setPatientUuid(String patientUuid) {
+		this.patientUuid = patientUuid;
 	}
 	
 	public String getDoctorId() {
@@ -71,8 +71,8 @@ public class Note {
 	@Override
 	public String toString() {
 		StringBuilder string = new StringBuilder()
-				.append("patientId: ")
-				.append(this.patientId)
+				.append("patientUuid: ")
+				.append(this.patientUuid)
 				.append(" - creation date: ")
 				.append(this.createdAt);
 			

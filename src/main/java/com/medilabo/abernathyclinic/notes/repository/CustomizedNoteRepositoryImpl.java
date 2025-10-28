@@ -20,9 +20,9 @@ public class CustomizedNoteRepositoryImpl implements CustomizedNoteRepository {
 	}
 
 	@Override
-	public Mono<Note> findByPatientIdAndCreatedAt(String patientId, LocalDateTime createdAt) {
+	public Mono<Note> findByPatientUuidAndCreatedAt(String patientUuid, LocalDateTime createdAt) {
 		Query query = new Query()
-				.addCriteria(Criteria.where("patientId").is(patientId))
+				.addCriteria(Criteria.where("patientUuid").is(patientUuid))
 				.addCriteria(Criteria.where("createdAt").is(createdAt));
 				
 		return template.query(Note.class).matching(query).first();
