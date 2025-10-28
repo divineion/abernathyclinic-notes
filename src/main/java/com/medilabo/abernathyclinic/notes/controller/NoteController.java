@@ -24,8 +24,8 @@ public class NoteController {
 	}
 	
 	@GetMapping("/api/note/{id}")
-	public ResponseEntity<Mono<Note>> getNoteById(@PathVariable String id) {
-		return new ResponseEntity<Mono<Note>>(noteService.findById(id), HttpStatus.OK);
+	public ResponseEntity<Mono<CreateNoteDto>> getNoteById(@PathVariable String id) {
+		return new ResponseEntity<Mono<CreateNoteDto>>(noteService.findById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/api/notes/patient/{patientUuid}")

@@ -24,9 +24,15 @@ public class NoteService {
 		this.customizedRepository = customizedRepository;
 	}
 	
-	public Mono<Note> findById(String id) {
+	public Mono<CreateNoteDto> findById(String id) {
 		return noteRepository.findById(id)
-				.doOnError(_ -> new NoteNotFoundException("note not found"));
+				.doOnError(_ -> new NoteNotFoundException("note not found"))
+				.map(note -> new CreateNoteDto(
+						note.getPatientUuid(), 
+						note.getDoctorId(), 
+						note.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+						note.getUpdatedAt() != null ? note.getUpdatedAt().format(DateTimeFormatter.ISO_DATE_TIME) : null, 
+						note.getContent()));
 	}
 
 	public Flux<Note> findByPatientUuid(String patientUuid) {
