@@ -24,10 +24,6 @@ public class NoteService {
 		this.customizedRepository = customizedRepository;
 	}
 	
-	public Flux<Note> findAllNotes() {
-		return noteRepository.findAll();
-	}
-	
 	public Mono<Note> findById(String id) {
 		return noteRepository.findById(id)
 				.doOnError(_ -> new NoteNotFoundException("note not found"));
