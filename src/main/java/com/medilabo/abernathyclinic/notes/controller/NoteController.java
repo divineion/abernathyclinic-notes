@@ -28,8 +28,8 @@ public class NoteController {
 		return new ResponseEntity<Mono<Note>>(noteService.findById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/api/note/patient/{patientUuid}")
-	public ResponseEntity<Flux<Note>> getNoteByPatientUuid(@PathVariable String patientUuid) {
+	@GetMapping("/api/notes/patient/{patientUuid}")
+	public ResponseEntity<Flux<Note>> getNotesByPatientUuid(@PathVariable String patientUuid) {
 		return new ResponseEntity<Flux<Note>>(noteService.findByPatientUuid(patientUuid), HttpStatus.OK);
 	}
 	
