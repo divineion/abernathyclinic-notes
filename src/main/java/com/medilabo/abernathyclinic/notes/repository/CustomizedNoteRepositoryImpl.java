@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.medilabo.abernathyclinic.notes.entity.Note;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -26,5 +27,13 @@ public class CustomizedNoteRepositoryImpl implements CustomizedNoteRepository {
 				.addCriteria(Criteria.where("createdAt").is(createdAt));
 				
 		return template.query(Note.class).matching(query).first();
+	}
+	
+	@Override
+	public Flux<Note> findByPatientUuid(String patientUuid) {
+		Query query = new Query()
+				.addCriteria(Criteria.where("patientUuid").is(patientUuid));
+		
+		return template.query(Note.class).matching(query).all();
 	}
 }
