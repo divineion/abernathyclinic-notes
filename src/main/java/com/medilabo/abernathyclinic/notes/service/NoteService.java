@@ -1,6 +1,7 @@
 package com.medilabo.abernathyclinic.notes.service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
@@ -36,9 +37,13 @@ public class NoteService {
 		return customizedRepository.findByPatientUuid(patientUuid);
 	}
 
-	public Mono<Note> createNote(CreateNoteDto noteDto) {
-		CreateNoteDto noteToSave = new CreateNoteDto(noteDto.patientUuid(), noteDto.doctorId(), noteDto.createdAt(), noteDto.updatedAt(), noteDto.content());
-		Note note = new Note(noteToSave.patientUuid(), noteToSave.doctorId(), LocalDateTime.now(), null, noteToSave.content());
-		return noteRepository.save(note);
+	public Mono<CreateNoteDto> createNote(CreateNoteDto noteDto) {
+		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
+		//récupérer le Mono, le traiter avec map pour lui faire émettre un dto
+		return noteRepository.save(note)
+			.map(createdNote -> new CreateNoteDto(
+					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
+					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
+					null, createdNote.getContent()));
 	}
 }

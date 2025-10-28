@@ -34,7 +34,7 @@ public class NoteController {
 	}
 	
 	@PostMapping("/api/note/patient/{patientUuid}")
-	public ResponseEntity<Mono<Note>> createNote(@PathVariable String patientUuid, @RequestBody CreateNoteDto noteDto) {
-		return new ResponseEntity<Mono<Note>>(noteService.createNote(noteDto), HttpStatus.CREATED);
+	public ResponseEntity<Mono<CreateNoteDto>> createNote(@PathVariable String patientUuid, @RequestBody CreateNoteDto noteDto) {
+		return new ResponseEntity<Mono<CreateNoteDto>>(noteService.createNote(noteDto), HttpStatus.CREATED);
 	}
 }
