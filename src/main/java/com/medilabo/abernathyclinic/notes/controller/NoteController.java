@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
+import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
 

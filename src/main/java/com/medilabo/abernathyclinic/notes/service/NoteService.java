@@ -28,6 +28,7 @@ public class NoteService {
 		return noteRepository.findById(id)
 				.switchIfEmpty(Mono.error(new NoteNotFoundException("Note not found")))
 				.map(note -> new NoteDto(
+						note.getId(),
 						note.getPatientUuid(), 
 						note.getDoctorId(), 
 						note.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
@@ -43,7 +44,7 @@ public class NoteService {
 		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
 		//récupérer le Mono, le traiter avec map pour lui faire émettre un dto
 		return noteRepository.save(note)
-			.map(createdNote -> new NoteDto(
+			.map(createdNote -> new NoteDto(note.getId(),
 					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
 					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
 					null, createdNote.getContent()));
