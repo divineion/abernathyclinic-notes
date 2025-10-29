@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
-import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
+import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.exceptions.NoteNotFoundException;
 import com.medilabo.abernathyclinic.notes.repository.CustomizedNoteRepository;
@@ -24,10 +24,10 @@ public class NoteService {
 		this.customizedRepository = customizedRepository;
 	}
 	
-	public Mono<CreateNoteDto> findById(String id) {
+	public Mono<NoteDto> findById(String id) {
 		return noteRepository.findById(id)
-				.doOnError(_ -> new NoteNotFoundException("note not found"))
-				.map(note -> new CreateNoteDto(
+				.switchIfEmpty(Mono.error(new NoteNotFoundException("Note not found")))
+				.map(note -> new NoteDto(
 						note.getPatientUuid(), 
 						note.getDoctorId(), 
 						note.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
@@ -39,11 +39,11 @@ public class NoteService {
 		return customizedRepository.findByPatientUuid(patientUuid);
 	}
 
-	public Mono<CreateNoteDto> createNote(CreateNoteDto noteDto) {
+	public Mono<NoteDto> createNote(NoteDto noteDto) {
 		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
 		//récupérer le Mono, le traiter avec map pour lui faire émettre un dto
 		return noteRepository.save(note)
-			.map(createdNote -> new CreateNoteDto(
+			.map(createdNote -> new NoteDto(
 					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
 					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
 					null, createdNote.getContent()));
