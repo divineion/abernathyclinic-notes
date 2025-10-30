@@ -1,6 +1,5 @@
 package com.medilabo.abernathyclinic.notes.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,17 +23,17 @@ public class NoteController {
 	}
 	
 	@GetMapping("/api/note/{id}")
-	public ResponseEntity<Mono<NoteDto>> getNoteById(@PathVariable String id) {
-		return new ResponseEntity<Mono<NoteDto>>(noteService.findById(id), HttpStatus.OK);
+	public Mono<NoteDto> getNoteById(@PathVariable String id) {
+		return noteService.findById(id);
 	}
-
+	
 	@GetMapping("/api/notes/patient/{patientUuid}")
-	public ResponseEntity<Flux<Note>> getNotesByPatientUuid(@PathVariable String patientUuid) {
-		return new ResponseEntity<Flux<Note>>(noteService.findByPatientUuid(patientUuid), HttpStatus.OK);
+	public Flux<Note> getNotesByPatientUuid(@PathVariable String patientUuid) {
+		return noteService.findByPatientUuid(patientUuid);
 	}
 	
 	@PostMapping("/api/note/patient/{patientUuid}")
-	public ResponseEntity<Mono<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody NoteDto noteDto) {
-		return new ResponseEntity<Mono<NoteDto>>(noteService.createNote(noteDto), HttpStatus.CREATED);
+	public Mono<ResponseEntity<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody NoteDto noteDto) {
+		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 }
