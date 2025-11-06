@@ -6,10 +6,12 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
+import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.exceptions.NoteNotFoundException;
 import com.medilabo.abernathyclinic.notes.repository.CustomizedNoteRepository;
 import com.medilabo.abernathyclinic.notes.repository.NoteRepository;
+import com.mongodb.client.result.UpdateResult;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,5 +50,22 @@ public class NoteService {
 					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
 					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
 					null, createdNote.getContent()));
+		// 4. le Mono<NoteDtoW> est retourné au contrôleur : l'objet est un pipeline prêt
+		// à s'exécuter mais pas encore déclenché
+	}
+
+	public Mono<UpdateResult> updateNote(String id, UpdateNoteDto noteDto) {
+		
+		return customizedRepository.updateNote(id, noteDto)
+				// vérifier le résultat non bloquant
+				.flatMap(updateResult -> {
+					// le flatMap est exécuté après que a BDD a renvoyé les résultats updateresult est déjà émis
+					// donc le if/else est exécuté sur une valeur existante en mémoire,, et non pas ds l'attente dune vvaleur
+					if (updateResult.getModifiedCount() == 0) {
+						return Mono.error(new NoteNotFoundException("No note found with id " + id + "for update"));
+					}
+					
+					return Mono.just(updateResult);
+				});
 	}
 }
