@@ -2,14 +2,16 @@ package com.medilabo.abernathyclinic.notes.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
-import com.medilabo.abernathyclinic.notes.entity.Note;
+import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
+import com.mongodb.client.result.UpdateResult;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,5 +37,10 @@ public class NoteController {
 	@PostMapping("/api/note/patient/{patientUuid}")
 	public Mono<ResponseEntity<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody NoteDto noteDto) {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
+	}
+	
+	@PatchMapping("/api/note/id/{id}/update")
+	public Mono<UpdateResult> updateNote(@PathVariable String id, @RequestBody UpdateNoteDto noteDto) {
+		return noteService.updateNote(id, noteDto);
 	}
 }
