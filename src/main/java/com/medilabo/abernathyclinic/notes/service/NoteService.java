@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
+import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
@@ -38,8 +39,17 @@ public class NoteService {
 						note.getContent()));
 	}
 
-	public Flux<Note> findByPatientUuid(String patientUuid) {
-		return customizedRepository.findByPatientUuid(patientUuid);
+	// retourner des dto pour la liste de notes 
+	public Flux<MinimalNoteDto> findByPatientUuid(String patientUuid) {
+		return customizedRepository.findByPatientUuid(patientUuid)
+			.map(note -> new MinimalNoteDto(
+					note.getId(), 
+					note.getPatientUuid(),
+					note.getDoctorId(),
+					note.getCreatedAt().toString(),
+					note.getUpdatedAt() == null ? null : note.getUpdatedAt().toString()
+				)
+			);
 	}
 
 	public Mono<NoteDto> createNote(NoteDto noteDto) {
