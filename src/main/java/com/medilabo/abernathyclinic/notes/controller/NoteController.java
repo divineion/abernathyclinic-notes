@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
@@ -30,7 +31,7 @@ public class NoteController {
 	}
 	
 	@GetMapping("/api/notes/patient/{patientUuid}")
-	public Flux<Note> getNotesByPatientUuid(@PathVariable String patientUuid) {
+	public Flux<MinimalNoteDto> getNotesByPatientUuid(@PathVariable String patientUuid) {
 		return noteService.findByPatientUuid(patientUuid);
 	}
 	
