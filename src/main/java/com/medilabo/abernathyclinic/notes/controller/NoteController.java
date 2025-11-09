@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
+import com.medilabo.abernathyclinic.notes.dto.UpdateResultDto;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
-import com.mongodb.client.result.UpdateResult;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,8 +40,8 @@ public class NoteController {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 	
-	@PatchMapping("/api/note/id/{id}/update")
-	public Mono<UpdateResult> updateNote(@PathVariable String id, @RequestBody UpdateNoteDto noteDto) {
-		return noteService.updateNote(id, noteDto);
+	@PatchMapping("/api/note/{id}/update")
+	public Mono<UpdateResultDto> updateNote(@PathVariable String id, @RequestBody UpdateNoteDto noteDto) {
+		return noteService.updateNote(id, noteDto).map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
 	}
 }
