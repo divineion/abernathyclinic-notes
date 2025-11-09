@@ -52,6 +52,16 @@ public class NoteService {
 			);
 	}
 
+	public Flux<MinimalNoteDto> findByDoctorId(String doctorId) {
+		return customizedRepository.findByDoctorId(doctorId)
+				.map((note) -> new MinimalNoteDto( 
+						note.getId(), 
+						note.getPatientUuid(),
+						note.getDoctorId(),
+						note.getCreatedAt().toString(),
+						note.getUpdatedAt() == null ? null : note.getUpdatedAt().toString()));
+	}
+
 	public Mono<NoteDto> createNote(NoteDto noteDto) {
 		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
 		//récupérer le Mono, le traiter avec map pour lui faire émettre un dto
