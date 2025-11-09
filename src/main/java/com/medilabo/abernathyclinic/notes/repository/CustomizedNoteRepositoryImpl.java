@@ -44,6 +44,16 @@ public class CustomizedNoteRepositoryImpl implements CustomizedNoteRepository {
 		
 		return template.query(Note.class).matching(query).all();
 	}
+	
+
+	@Override
+	public Flux<Note> findByDoctorId(String doctorId) {
+		
+		Query query = new Query()
+				.addCriteria(Criteria.where("doctorId").is(doctorId));
+		
+		return template.query(Note.class).matching(query).all();
+	}
 
 	@Override
 	public Mono<UpdateResult> updateNote(String id, UpdateNoteDto noteDto) {

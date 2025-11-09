@@ -13,6 +13,8 @@ public interface CustomizedNoteRepository {
 	Mono<Note> findByPatientUuidAndCreatedAt(String patientUuid, LocalDateTime createdAt);
 
 	Flux<Note> findByPatientUuid(String patientUuid);
+	
+	Flux<Note> findByDoctorId(String doctorId);
 
 	Mono<UpdateResult> updateNote(String id, UpdateNoteDto noteDto);
 }
