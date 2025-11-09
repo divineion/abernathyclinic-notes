@@ -35,6 +35,11 @@ public class NoteController {
 		return noteService.findByPatientUuid(patientUuid);
 	}
 	
+	@GetMapping("/api/notes/doctor/{doctorId}")
+	public Flux<MinimalNoteDto> getNotesByDoctorId(@PathVariable String doctorId) {
+		return noteService.findByDoctorId(doctorId);
+	}
+	
 	@PostMapping("/api/note/patient/{patientUuid}")
 	public Mono<ResponseEntity<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody NoteDto noteDto) {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
