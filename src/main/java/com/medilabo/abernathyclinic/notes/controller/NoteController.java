@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
@@ -45,8 +46,14 @@ public class NoteController {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 	
-	@PatchMapping("/api/note/{id}/update")
-	public Mono<UpdateResultDto> updateNote(@PathVariable String id, @RequestBody UpdateNoteDto noteDto) {
-		return noteService.updateNote(id, noteDto).map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
+	@PatchMapping("/api/note/{noteId}/update")
+	public Mono<UpdateResultDto> updateNote(
+			@PathVariable String noteId, 
+			@RequestBody UpdateNoteDto noteDto,
+			@RequestHeader("X-Auth-User-Roles") String role,
+			@RequestHeader("X-Auth-User-Id") String authenticatedUserId) {	
+		
+	return noteService.updateNote(noteId, noteDto, authenticatedUserId)
+					.map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
 	}
 }

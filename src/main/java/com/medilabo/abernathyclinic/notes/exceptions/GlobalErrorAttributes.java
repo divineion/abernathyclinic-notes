@@ -18,15 +18,23 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
 		
 		int status;
 		
-		if (isNotFound(error)) {
+		if (isForbidden(error)) {
+			status = 403;
+			errorPropertiesMap.put("status", status);
+			errorPropertiesMap.put("error", HttpStatus.FORBIDDEN.getReasonPhrase());
+		} else if (isNotFound(error)) {
 			status = 404;
 			errorPropertiesMap.put("status", status);
 			errorPropertiesMap.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
 		}
-		
+				
 		errorPropertiesMap.put("message", error.getMessage());
 		
 		return errorPropertiesMap;
+	}
+	
+	boolean isForbidden(Throwable error) {
+		return error instanceof ForbiddenAccessException;
 	}
 	
 	boolean isNotFound(Throwable error) {
