@@ -13,7 +13,6 @@ import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateResultDto;
-import com.medilabo.abernathyclinic.notes.exceptions.ForbiddenAccessException;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
 
 import reactor.core.publisher.Flux;
@@ -54,10 +53,8 @@ public class NoteController {
 			@RequestBody UpdateNoteDto noteDto,
 			@RequestHeader("X-Auth-User-Roles") String role,
 			@RequestHeader("X-Auth-User-Id") String authenticatedUserId) {	
-	return (authenticatedUserId.equalsIgnoreCase(noteDto.doctorId())) 
-			? noteService.updateNote(noteId, noteDto)
-					.map(result -> 
-					new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()))
-			: Mono.error(new ForbiddenAccessException("Unauthorized"));
+		
+	return noteService.updateNote(noteId, noteDto, authenticatedUserId)
+					.map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
 	}
 }
