@@ -46,7 +46,6 @@ public class NoteController {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 	
-	// https://docs.spring.io/spring-framework/reference/web/webflux/controller/ann-methods/requestheader.html
 	@PatchMapping("/api/note/{noteId}/update")
 	public Mono<UpdateResultDto> updateNote(
 			@PathVariable String noteId, 
