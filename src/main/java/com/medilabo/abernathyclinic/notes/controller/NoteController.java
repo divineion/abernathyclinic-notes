@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateResultDto;
+import com.medilabo.abernathyclinic.notes.exceptions.ForbiddenAccessException;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
 
 import reactor.core.publisher.Flux;
@@ -45,8 +47,17 @@ public class NoteController {
 		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 	
-	@PatchMapping("/api/note/{id}/update")
-	public Mono<UpdateResultDto> updateNote(@PathVariable String id, @RequestBody UpdateNoteDto noteDto) {
-		return noteService.updateNote(id, noteDto).map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
+	// https://docs.spring.io/spring-framework/reference/web/webflux/controller/ann-methods/requestheader.html
+	@PatchMapping("/api/note/{noteId}/update")
+	public Mono<UpdateResultDto> updateNote(
+			@PathVariable String noteId, 
+			@RequestBody UpdateNoteDto noteDto,
+			@RequestHeader("X-Auth-User-Roles") String role,
+			@RequestHeader("X-Auth-User-Id") String authenticatedUserId) {	
+	return (authenticatedUserId.equalsIgnoreCase(noteDto.doctorId())) 
+			? noteService.updateNote(noteId, noteDto)
+					.map(result -> 
+					new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()))
+			: Mono.error(new ForbiddenAccessException("Unauthorized"));
 	}
 }
