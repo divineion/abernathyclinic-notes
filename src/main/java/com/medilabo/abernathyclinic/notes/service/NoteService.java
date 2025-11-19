@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
+import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
@@ -62,8 +63,8 @@ public class NoteService {
 						note.getUpdatedAt() == null ? null : note.getUpdatedAt().toString()));
 	}
 
-	public Mono<NoteDto> createNote(NoteDto noteDto) {
-		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
+	public Mono<NoteDto> createNote(String patientUuid, CreateNoteDto noteDto) {
+		Note note = new Note(patientUuid, noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
 		return noteRepository.save(note)
 			.map(createdNote -> new NoteDto(note.getId(),
 					createdNote.getPatientUuid(), createdNote.getDoctorId(), 

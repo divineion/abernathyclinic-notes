@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
@@ -43,8 +44,8 @@ public class NoteController {
 	}
 	
 	@PostMapping("/api/note/patient/{patientUuid}")
-	public Mono<ResponseEntity<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody NoteDto noteDto) {
-		return noteService.createNote(noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
+	public Mono<ResponseEntity<NoteDto>> createNote(@PathVariable String patientUuid, @RequestBody CreateNoteDto noteDto) {
+		return noteService.createNote(patientUuid, noteDto).map(createdNote -> ResponseEntity.status(201).body(createdNote));
 	}
 	
 	@PatchMapping("/api/note/{noteId}/update")
