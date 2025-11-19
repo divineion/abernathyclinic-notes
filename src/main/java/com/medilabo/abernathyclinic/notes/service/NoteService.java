@@ -1,5 +1,6 @@
 package com.medilabo.abernathyclinic.notes.service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,10 +24,12 @@ import reactor.core.publisher.Mono;
 public class NoteService {
 	private final NoteRepository noteRepository;
 	private final CustomizedNoteRepository customizedRepository;
+	private final Clock clock;
 
-	public NoteService(NoteRepository noteRepository, CustomizedNoteRepository customizedRepository) {
+	public NoteService(NoteRepository noteRepository, CustomizedNoteRepository customizedRepository, Clock clock) {
 		this.noteRepository = noteRepository;
 		this.customizedRepository = customizedRepository;
+		this.clock = clock;
 	}
 	
 	public Mono<NoteDto> findById(String id) {
@@ -64,7 +67,7 @@ public class NoteService {
 	}
 
 	public Mono<NoteDto> createNote(String patientUuid, CreateNoteDto noteDto) {
-		Note note = new Note(patientUuid, noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
+		Note note = new Note(patientUuid, noteDto.doctorId(), LocalDateTime.now(clock), null, noteDto.content());
 		return noteRepository.save(note)
 			.map(createdNote -> new NoteDto(
 					createdNote.getId(),
