@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,17 +41,21 @@ public class NoteServiceTest {
 	@InjectMocks
 	private NoteService service;
 	
-	@Test
-	public void testCreateNote_shouldReturn_NoteDto() {
-		// Arrange
+	private LocalDateTime fixedDateTime;
+	
+	@BeforeEach
+	public void setup() {
 		// Time settings
 		Instant fixedInstant = Instant.parse("2025-11-19T16:00:00Z");
         when(clock.instant()).thenReturn(fixedInstant);
         when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
         
-		LocalDateTime fixedDateTime = LocalDateTime.now(clock);
-
-		
+		fixedDateTime = LocalDateTime.now(clock);
+	}
+	
+	@Test
+	public void testCreateNote_shouldReturn_NoteDto() {
+		// Arrange	
         // Note settings 
 		String uuid = "82bcd28f-2db2-4e67-aed8-207774fdf52b";
 		String doctorId = "4";
