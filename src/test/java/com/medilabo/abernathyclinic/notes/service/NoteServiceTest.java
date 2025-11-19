@@ -1,6 +1,7 @@
 package com.medilabo.abernathyclinic.notes.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
@@ -62,8 +63,8 @@ public class NoteServiceTest {
 		String content = "Insertion d'une note de test pour un patient.";
 		
 		Note note = Note.withId("testId", uuid, doctorId, fixedDateTime, null, content);
-		Mono<Note> noteMono = Mono.just(note);
-		when(noteRepository.save(any(Note.class))).thenReturn(noteMono);
+
+		when(noteRepository.save(any(Note.class))).thenReturn(Mono.just(note));
 		
 		CreateNoteDto createNoteDto = new CreateNoteDto(doctorId, content);
 		
@@ -82,5 +83,35 @@ public class NoteServiceTest {
 		StepVerifier.create(result)
 			.expectNext(expectedNote)
 			.verifyComplete();
+	}
+	
+	@Test
+	public void findById_shouldReturnMinimalNoteDto() {
+		
+		// arrange
+		String uuid = "82bcd28f-2db2-4e67-aed8-207774fdf52b";
+		String doctorId = "4";
+		String content = "Test de lecture d'une note";
+		
+		Note mockedNote = Note.withId("testId", uuid, doctorId, fixedDateTime, null, content);
+		
+		when(noteRepository.findById(anyString())).thenReturn(Mono.just(mockedNote));
+		
+		// ACT
+		NoteDto expectedDto = new NoteDto(
+	            "testId",
+	            uuid,
+	            doctorId,
+	            fixedDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
+	            null, 
+	            content);
+
+		 Mono<NoteDto> result = service.findById("testId");
+
+		    // Assert
+		    StepVerifier.create(result)
+		            .expectNext(expectedDto)
+		            .verifyComplete();
+		
 	}
 }
