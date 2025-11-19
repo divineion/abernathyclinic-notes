@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.mongodb.client.result.UpdateResult;
@@ -66,4 +67,21 @@ public class CustomizedNoteRepositoryImpl implements CustomizedNoteRepository {
 		
 		return template.updateFirst(query, update, Note.class);
 	}
+
+	// https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/core/query/Query.html
+	// https://dev.to/iuriimednikov/how-to-build-custom-queries-with-spring-data-reactive-mongodb-1802
+	@Override
+	public Flux<NotesReportInfoDto> findReportPatientInfo(String uuid) {
+		Query query = new Query()
+				.addCriteria(Criteria.where("patientUuid").is(uuid));
+		query.fields()
+		.include("content");
+		return template
+				.query(Note.class)
+				.as(NotesReportInfoDto.class)
+				.matching(query).all();
+		
+	}
+	
+	
 }

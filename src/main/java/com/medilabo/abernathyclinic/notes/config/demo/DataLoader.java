@@ -26,10 +26,10 @@ public class DataLoader implements CommandLineRunner{
 		this.customRepository = customRepository;
 	}
 	
-	private static final String PATIENT_1_UUID = "de400f67-ccc9-4df9-86b3-b8f394ff3358";
-	private static final String PATIENT_2_UUID = "5ef4b247-d4c7-4742-a0f0-e8346f6087e2";
-	private static final String PATIENT_3_UUID = "e91c13e6-53f0-434a-b0e6-9c1f463a0cd1";
-	private static final String PATIENT_4_UUID = "116c8905-706f-4fc9-8d15-a755acf852df";
+	private static final String PATIENT_1_UUID = "87130455-7ef7-4ed9-ad79-7fe1c16d1b07";
+	private static final String PATIENT_2_UUID = "ee47cca2-a058-4656-91f3-765677c464ac";
+	private static final String PATIENT_3_UUID = "814d2b0f-92d2-4e84-bf43-3b26815df7ee";
+	private static final String PATIENT_4_UUID = "fb41177e-cf31-49f8-b03b-8d36d7bc1a2f";
 
 	private static final String DOCTOR_1_ID = "4";
 	private static final String DOCTOR_2_ID = "5";
@@ -38,10 +38,12 @@ public class DataLoader implements CommandLineRunner{
 	public void run(String... args) throws Exception {
 		List<Note> notes = new ArrayList<>();
 				
+		// NONE
 		Note testNote1 = new Note(PATIENT_1_UUID, DOCTOR_1_ID, LocalDateTime.of(2025, Month.AUGUST, 25, 10, 40), null, "Le patient déclare qu'il 'se sent très bien' \n "
 						+ "Poids égal ou inférieur au poids recommandé");
 		addIfNotExists(testNote1, notes);
 
+		//BORDERLINE
 		Note testNote2 = new Note(PATIENT_2_UUID, DOCTOR_1_ID, LocalDateTime.of(2025, Month.AUGUST, 25, 10, 40), null, 
 				"Le patient déclare qu'il ressent beaucoup de stress au travail \n "
 				+ "Il se plaint également que son audition est anormale dernièrement");
@@ -52,6 +54,8 @@ public class DataLoader implements CommandLineRunner{
 				+ " Il remarque également que son audition continue d'être anormale");
 		addIfNotExists(testNote3, notes);
 		
+		
+		// IN DANGER
 		Note testNote4 = new Note(PATIENT_3_UUID, DOCTOR_2_ID, LocalDateTime.of(2023, Month.AUGUST, 22, 14, 15), null, 
 				"Le patient déclare qu'il qu'il fume depuis peu");
 		addIfNotExists(testNote4, notes);
@@ -62,6 +66,8 @@ public class DataLoader implements CommandLineRunner{
 				+ "Tests de laboratoire indiquant un taux de cholestérol LDL élevé");
 		addIfNotExists(testNote5, notes);
 		
+		
+		// REALY ONSET
 		Note testNote6 = new Note(PATIENT_4_UUID, DOCTOR_2_ID, LocalDateTime.of(2023, Month.AUGUST, 25, 14, 40), null, 
 				"Le patient déclare qu'il lui est devenu difficile de monter les escaliers \n"
 				+ "Il se plaint également d’être essoufflé \n"

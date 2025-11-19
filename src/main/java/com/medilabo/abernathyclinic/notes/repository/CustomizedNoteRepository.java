@@ -2,6 +2,7 @@ package com.medilabo.abernathyclinic.notes.repository;
 
 import java.time.LocalDateTime;
 
+import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.mongodb.client.result.UpdateResult;
@@ -17,4 +18,6 @@ public interface CustomizedNoteRepository {
 	Flux<Note> findByDoctorId(String doctorId);
 
 	Mono<UpdateResult> updateNote(String id, UpdateNoteDto noteDto);
+	
+	Flux<NotesReportInfoDto> findReportPatientInfo(String uuid);
 }
