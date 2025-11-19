@@ -56,7 +56,7 @@ public class NoteServiceTest {
 		String doctorId = "4";
 		String content = "Insertion d'une note de test pour un patient.";
 		
-		Note note = new Note("testId", uuid, doctorId, fixedDateTime, null, content);
+		Note note = Note.withId("testId", uuid, doctorId, fixedDateTime, null, content);
 		Mono<Note> noteMono = Mono.just(note);
 		when(noteRepository.save(any(Note.class))).thenReturn(noteMono);
 		
