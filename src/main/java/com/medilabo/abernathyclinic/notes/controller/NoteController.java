@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
+import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateResultDto;
 import com.medilabo.abernathyclinic.notes.service.NoteService;
@@ -56,4 +57,11 @@ public class NoteController {
 	return noteService.updateNote(noteId, noteDto, authenticatedUserId)
 					.map(result -> new UpdateResultDto(result.getMatchedCount() > 0, result.getModifiedCount()));
 	}
+	
+	@GetMapping("/api/notes/{uuid}/report-info")
+	public Flux<NotesReportInfoDto> getNotesReportInfo(@PathVariable("uuid") String patientUuid) {
+		return noteService.getNotesInfoForReport(patientUuid);
+	}
+	
+	
 }

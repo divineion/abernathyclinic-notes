@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
+import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
 import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.exceptions.ForbiddenAccessException;
@@ -105,5 +106,9 @@ public class NoteService {
 				
 				return Mono.just(updateResult);
 			});
+	}
+
+	public Flux<NotesReportInfoDto> getNotesInfoForReport(String patientUuid) {
+		return customizedRepository.findReportPatientInfo(patientUuid);
 	}
 }
