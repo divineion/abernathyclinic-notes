@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
+import com.medilabo.abernathyclinic.notes.exceptions.NoteNotFoundException;
 import com.medilabo.abernathyclinic.notes.repository.CustomizedNoteRepository;
 import com.medilabo.abernathyclinic.notes.repository.NoteRepository;
 
@@ -113,5 +114,14 @@ public class NoteServiceTest {
 		            .expectNext(expectedDto)
 		            .verifyComplete();
 		
+	}
+	
+	@Test
+	public void findById_shouldThrowNoteNotFoundException_whenNoteDoesNotExist() {
+	    when(noteRepository.findById(anyString())).thenReturn(Mono.empty());
+
+	    StepVerifier.create(service.findById("unknownId"))
+	        .expectError(NoteNotFoundException.class)
+	        .verify();
 	}
 }
