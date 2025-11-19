@@ -66,10 +66,13 @@ public class NoteService {
 	public Mono<NoteDto> createNote(String patientUuid, CreateNoteDto noteDto) {
 		Note note = new Note(patientUuid, noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
 		return noteRepository.save(note)
-			.map(createdNote -> new NoteDto(note.getId(),
-					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
+			.map(createdNote -> new NoteDto(
+					createdNote.getId(),
+					createdNote.getPatientUuid(), 
+					createdNote.getDoctorId(), 
 					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
-					null, createdNote.getContent()));
+					null, 
+					createdNote.getContent()));
 	}
 	
 	/**
