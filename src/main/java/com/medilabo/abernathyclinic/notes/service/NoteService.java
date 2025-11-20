@@ -1,10 +1,12 @@
 package com.medilabo.abernathyclinic.notes.service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
+import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
@@ -22,10 +24,12 @@ import reactor.core.publisher.Mono;
 public class NoteService {
 	private final NoteRepository noteRepository;
 	private final CustomizedNoteRepository customizedRepository;
+	private final Clock clock;
 
-	public NoteService(NoteRepository noteRepository, CustomizedNoteRepository customizedRepository) {
+	public NoteService(NoteRepository noteRepository, CustomizedNoteRepository customizedRepository, Clock clock) {
 		this.noteRepository = noteRepository;
 		this.customizedRepository = customizedRepository;
+		this.clock = clock;
 	}
 	
 	public Mono<NoteDto> findById(String id) {
@@ -40,7 +44,6 @@ public class NoteService {
 						note.getContent()));
 	}
 
-	// retourner des dto pour la liste de notes 
 	public Flux<MinimalNoteDto> findByPatientUuid(String patientUuid) {
 		return customizedRepository.findByPatientUuid(patientUuid)
 			.map(note -> new MinimalNoteDto(
@@ -63,20 +66,20 @@ public class NoteService {
 						note.getUpdatedAt() == null ? null : note.getUpdatedAt().toString()));
 	}
 
-	public Mono<NoteDto> createNote(NoteDto noteDto) {
-		Note note = new Note(noteDto.patientUuid(), noteDto.doctorId(), LocalDateTime.now(), null, noteDto.content());
-		//récupérer le Mono, le traiter avec map pour lui faire émettre un dto
+	public Mono<NoteDto> createNote(String patientUuid, CreateNoteDto noteDto) {
+		Note note = new Note(patientUuid, noteDto.doctorId(), LocalDateTime.now(clock), null, noteDto.content());
 		return noteRepository.save(note)
-			.map(createdNote -> new NoteDto(note.getId(),
-					createdNote.getPatientUuid(), createdNote.getDoctorId(), 
+			.map(createdNote -> new NoteDto(
+					createdNote.getId(),
+					createdNote.getPatientUuid(), 
+					createdNote.getDoctorId(), 
 					createdNote.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME), 
-					null, createdNote.getContent()));
-		// 4. le Mono<NoteDtoW> est retourné au contrôleur : l'objet est un pipeline prêt
-		// à s'exécuter mais pas encore déclenché
+					null, 
+					createdNote.getContent()));
 	}
 	
 	/**
-	 * Verfieis that the user is the note's author. 
+	 * Verifies that the user is the note's author. 
 	 * @param noteId
 	 * @param authenticatedUserId
 	 * @return
@@ -87,7 +90,6 @@ public class NoteService {
 				if (!note.getDoctorId().equals(authenticatedUserId)) {
 					return Mono.error(new ForbiddenAccessException("Unauthorized"));
 				}
-				// si pas d'erreur, alors on complete 
 				return Mono.empty();
 			});
 	}
@@ -96,10 +98,7 @@ public class NoteService {
 		
 		return validateUserAccess(noteId, authenticatedUserId) // chaîner les appels réactifs... sinon pas d'exécution
 			.then(customizedRepository.updateNote(noteId, noteDto))
-			// vérifier le résultat non bloquant
 			.flatMap(updateResult -> {
-				// le flatMap est exécuté après que a BDD a renvoyé les résultats updateresult est déjà émis
-				// donc le if/else est exécuté sur une valeur existante en mémoire,, et non pas ds l'attente dune vvaleur
 				if (updateResult.getModifiedCount() == 0) {
 					return Mono.error(new NoteNotFoundException("No note found with id " + noteId + " for update"));
 				}

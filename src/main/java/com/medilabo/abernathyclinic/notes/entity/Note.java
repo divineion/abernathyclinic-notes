@@ -15,6 +15,8 @@ public class Note {
 	private LocalDateTime updatedAt;
 	private String content;
 	
+	public Note() {}
+	
 	public Note(String patientUuid, String doctorId, LocalDateTime createdAt,
 			LocalDateTime updatedAt, String content) {
 		this.patientUuid = patientUuid;
@@ -22,6 +24,21 @@ public class Note {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.content = content;
+	}
+	
+	private Note(String id, String patientUuid, String doctorId, LocalDateTime createdAt,
+	        LocalDateTime updatedAt, String content) {
+	    this.id = id;
+	    this.patientUuid = patientUuid;
+	    this.doctorId = doctorId;
+	    this.createdAt = createdAt;
+	    this.updatedAt = updatedAt;
+	    this.content = content;
+	}
+	
+	public static Note withId(String id, String patientUuid, String doctorId, 
+			LocalDateTime createdAt, LocalDateTime updatedAt, String content) {
+	    return new Note(id, patientUuid, doctorId, createdAt, updatedAt, content);
 	}
 
 	public String getId() {
@@ -66,16 +83,5 @@ public class Note {
 	
 	public void setContent(String content) {
 		this.content = content;
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder string = new StringBuilder()
-				.append("patientUuid: ")
-				.append(this.patientUuid)
-				.append(" - creation date: ")
-				.append(this.createdAt);
-			
-				return string.toString();
 	}
 }
