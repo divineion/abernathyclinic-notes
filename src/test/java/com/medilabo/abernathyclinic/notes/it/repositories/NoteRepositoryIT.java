@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.repository.NoteRepository;
@@ -14,6 +16,8 @@ import com.medilabo.abernathyclinic.notes.repository.NoteRepository;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class NoteRepositoryIT {
 	@Autowired
 	private NoteRepository repository;
