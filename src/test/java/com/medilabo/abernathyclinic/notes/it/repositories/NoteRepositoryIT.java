@@ -1,4 +1,4 @@
-package com.medilabo.abernathyclinic.notes.it;
+package com.medilabo.abernathyclinic.notes.it.repositories;
 
 import static org.junit.Assert.assertNotNull;
 
