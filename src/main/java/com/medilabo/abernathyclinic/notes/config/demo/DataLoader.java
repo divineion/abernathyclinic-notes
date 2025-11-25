@@ -18,24 +18,24 @@ import reactor.core.publisher.Mono;
 @Profile("dev")
 @Component
 public class DataLoader implements CommandLineRunner{
-	private NoteRepository repository;
-	private CustomizedNoteRepositoryImpl customRepository;
+	private final NoteRepository repository;
+	private final CustomizedNoteRepositoryImpl customRepository;
 
 	public DataLoader(NoteRepository repository, CustomizedNoteRepositoryImpl customRepository) {
 		this.repository = repository;
 		this.customRepository = customRepository;
 	}
-	
-	private static final String PATIENT_1_UUID = "87130455-7ef7-4ed9-ad79-7fe1c16d1b07";
-	private static final String PATIENT_2_UUID = "ee47cca2-a058-4656-91f3-765677c464ac";
-	private static final String PATIENT_3_UUID = "814d2b0f-92d2-4e84-bf43-3b26815df7ee";
-	private static final String PATIENT_4_UUID = "fb41177e-cf31-49f8-b03b-8d36d7bc1a2f";
 
 	private static final String DOCTOR_1_ID = "4";
 	private static final String DOCTOR_2_ID = "5";
 
 	@Override
 	public void run(String... args) throws Exception {
+		String PATIENT_1_UUID = "6c1fe1a2-62cd-4c94-969d-68d07d8e8bdb";
+		String PATIENT_2_UUID = "d6d4aa48-0fba-4845-9659-4b3a336d988c";
+		String PATIENT_3_UUID = "f3136613-bb6e-4fcf-86d8-f560fbfb8dac";
+		String PATIENT_4_UUID = "44d93e2b-2db1-4617-9f49-f0de94567d03";
+
 		List<Note> notes = new ArrayList<>();
 				
 		// NONE
