@@ -4,10 +4,15 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.repository.CustomizedNoteRepositoryImpl;
@@ -18,24 +23,50 @@ import reactor.core.publisher.Mono;
 @Profile("dev")
 @Component
 public class DataLoader implements CommandLineRunner{
-	private NoteRepository repository;
-	private CustomizedNoteRepositoryImpl customRepository;
+	private final NoteRepository repository;
+	private final CustomizedNoteRepositoryImpl customRepository;
+	private final WebClient webClient;
 
-	public DataLoader(NoteRepository repository, CustomizedNoteRepositoryImpl customRepository) {
+	public DataLoader(NoteRepository repository, CustomizedNoteRepositoryImpl customRepository, WebClient webClient) {
 		this.repository = repository;
 		this.customRepository = customRepository;
+		this.webClient = webClient;
 	}
-	
-	private static final String PATIENT_1_UUID = "87130455-7ef7-4ed9-ad79-7fe1c16d1b07";
-	private static final String PATIENT_2_UUID = "ee47cca2-a058-4656-91f3-765677c464ac";
-	private static final String PATIENT_3_UUID = "814d2b0f-92d2-4e84-bf43-3b26815df7ee";
-	private static final String PATIENT_4_UUID = "fb41177e-cf31-49f8-b03b-8d36d7bc1a2f";
 
 	private static final String DOCTOR_1_ID = "4";
 	private static final String DOCTOR_2_ID = "5";
+	
+	@Value("${patient.service.url}")
+	private String patientServiceUrl;
 
 	@Override
 	public void run(String... args) throws Exception {
+		 List<Map<String, Object>> patients = webClient.get()
+		            .uri(patientServiceUrl)
+		            .retrieve()
+		            .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+		            .block(); // bloquer pour seed 
+		 
+		 // vérifier qu'on a bien tous les patients du service patients
+		 if (patients == null || patients.size() < 4) {
+		        System.err.println("Error : at least 4 patients are required for demo notes initialization.");
+		        return;
+		 }
+		 
+		// un Map pour affecter les notes aux bons patients
+		 Map<String, String> patientUuidByName = patients.stream()
+		         .collect(Collectors.toMap(
+		             p -> (String) p.get("lastName"), 
+		             p -> (String) p.get("uuid")
+		         ));
+
+		 // et récupérer les bns id
+		 String PATIENT_1_UUID = patientUuidByName.get("TestNone");
+		 String PATIENT_2_UUID = patientUuidByName.get("TestBorderline");
+		 String PATIENT_3_UUID = patientUuidByName.get("TestInDanger");
+		 String PATIENT_4_UUID = patientUuidByName.get("TestEarlyOnset");
+
+		
 		List<Note> notes = new ArrayList<>();
 				
 		// NONE
