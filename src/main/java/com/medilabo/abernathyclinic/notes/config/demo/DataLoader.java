@@ -4,15 +4,10 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.repository.CustomizedNoteRepositoryImpl;
@@ -25,48 +20,22 @@ import reactor.core.publisher.Mono;
 public class DataLoader implements CommandLineRunner{
 	private final NoteRepository repository;
 	private final CustomizedNoteRepositoryImpl customRepository;
-	private final WebClient webClient;
 
-	public DataLoader(NoteRepository repository, CustomizedNoteRepositoryImpl customRepository, WebClient webClient) {
+	public DataLoader(NoteRepository repository, CustomizedNoteRepositoryImpl customRepository) {
 		this.repository = repository;
 		this.customRepository = customRepository;
-		this.webClient = webClient;
 	}
 
 	private static final String DOCTOR_1_ID = "4";
 	private static final String DOCTOR_2_ID = "5";
-	
-	@Value("${patient.service.url}")
-	private String patientServiceUrl;
 
 	@Override
 	public void run(String... args) throws Exception {
-		 List<Map<String, Object>> patients = webClient.get()
-		            .uri(patientServiceUrl)
-		            .retrieve()
-		            .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
-		            .block(); // bloquer pour seed 
-		 
-		 // vérifier qu'on a bien tous les patients du service patients
-		 if (patients == null || patients.size() < 4) {
-		        System.err.println("Error : at least 4 patients are required for demo notes initialization.");
-		        return;
-		 }
-		 
-		// un Map pour affecter les notes aux bons patients
-		 Map<String, String> patientUuidByName = patients.stream()
-		         .collect(Collectors.toMap(
-		             p -> (String) p.get("lastName"), 
-		             p -> (String) p.get("uuid")
-		         ));
+		String PATIENT_1_UUID = "6c1fe1a2-62cd-4c94-969d-68d07d8e8bdb";
+		String PATIENT_2_UUID = "d6d4aa48-0fba-4845-9659-4b3a336d988c";
+		String PATIENT_3_UUID = "f3136613-bb6e-4fcf-86d8-f560fbfb8dac";
+		String PATIENT_4_UUID = "44d93e2b-2db1-4617-9f49-f0de94567d03";
 
-		 // et récupérer les bns id
-		 String PATIENT_1_UUID = patientUuidByName.get("TestNone");
-		 String PATIENT_2_UUID = patientUuidByName.get("TestBorderline");
-		 String PATIENT_3_UUID = patientUuidByName.get("TestInDanger");
-		 String PATIENT_4_UUID = patientUuidByName.get("TestEarlyOnset");
-
-		
 		List<Note> notes = new ArrayList<>();
 				
 		// NONE
