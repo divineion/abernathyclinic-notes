@@ -7,9 +7,10 @@ variables:
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - integration-test
   - package
   - image
-  - integration-test
+  - image-run
 
 cache:            # jobs that use the same cache don’t have to download the files again
   paths:
@@ -31,6 +32,20 @@ test-job:
   stage: test
   script:
     - mvn clean test
+
+# Tests d'Intégration avec Testcontainers
+integration-job:
+  stage: integration-test
+  # besoin de DinD pour Testcontainers
+  services:
+    - docker:dind
+  variables:
+    # permettre à Testcontainers de contacter le daemon Docker de GitLab
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    # Oexécuter les *IT.java avec mvn verify et croiser les doigts
+    - mvn verify --batch-mode
 
 # création du JAR
 package-job: 
@@ -60,26 +75,29 @@ image-job:
     - docker build -t divineion/microservice-notes:$CI_COMMIT_REF_SLUG .
     - docker push divineion/microservice-notes:$CI_COMMIT_REF_SLUG
 
-integration-job: 
+image-run-job: 
 # pointer vers le daemon Docker dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   services:
   - docker:dind
-  stage: integration-test
+  stage: image-run
   dependencies:
     - image-job
   before_script: apk add --no-cache docker-cli 
   script: 
-# lancer le conteneur en mode détaché pour libérer le terminal et exécuter les tests avec Maven
+# lancer le conteneur en mode détaché pour libérer le terminal
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
     - docker pull divineion/microservice-notes:$CI_COMMIT_REF_SLUG
+    - docker network create notes-test-network
+    - docker run -d --name notes-test-database --network notes-test-network mongo:6.0
     - |
       docker run -d --name notes-container --rm \
+      --network notes-test-network \
       -e SPRING_PROFILES_ACTIVE=test \
-      -e SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI \
+      -e SPRING_DATA_MONGODB_URI=mongodb://notes-test-database:27017/testdb \
       divineion/microservice-notes:$CI_COMMIT_REF_SLUG
     - docker ps
-    - mvn clean verify
-    - docker stop notes-container
+    - docker logs notes-container
+    - docker stop notes-container 
