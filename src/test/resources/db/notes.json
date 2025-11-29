@@ -1,0 +1,18 @@
+[
+  {
+    "id": "6915caf18a6b14e96442877e",
+    "patientUuid": "82bcd28f-2db2-4e67-aed8-207774fdf52b",
+    "doctorId": "4",
+    "createdAt": "2024-11-20T01:40:00",
+    "updatedAt": null,
+    "content": "Test content 1"
+  },
+  {
+    "id": "6915caf18a6b14e96442877f",
+    "patientUuid": "82bcd28f-2db2-4e67-aed8-207774fdf52b",
+    "doctorId": "5",
+    "createdAt": "2025-11-20T01:40:00",
+    "updatedAt": null,
+    "content": "Test content 2"
+  }
+]
