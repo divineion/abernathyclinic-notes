@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -19,7 +20,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medilabo.abernathyclinic.notes.dto.CreateNoteDto;
+import com.medilabo.abernathyclinic.notes.dto.MinimalNoteDto;
 import com.medilabo.abernathyclinic.notes.dto.NoteDto;
+import com.medilabo.abernathyclinic.notes.dto.NotesReportInfoDto;
+import com.medilabo.abernathyclinic.notes.dto.UpdateNoteDto;
+import com.medilabo.abernathyclinic.notes.dto.UpdateResultDto;
 import com.medilabo.abernathyclinic.notes.entity.Note;
 import com.medilabo.abernathyclinic.notes.repository.NoteRepository;
 
@@ -42,7 +47,7 @@ public class NoteControllerIT {
     
     private String noteId1 = "6915caf18a6b14e96442877e";
     
-    private String patient1Uuid = "6915caf18a6b14e96442877e";
+    private String patient1Uuid = "82bcd28f-2db2-4e67-aed8-207774fdf52b";
 
     @BeforeEach
     void setUp() throws IOException {
@@ -53,7 +58,7 @@ public class NoteControllerIT {
         new TypeReference<>() {}
     );
 
-        noteRepository.saveAll(notes).blockLast(); // block pour que les données soient bien en place avant le test
+        noteRepository.saveAll(notes).blockLast();
     }
 
     @Test
@@ -78,20 +83,80 @@ public class NoteControllerIT {
     	
     	String noteContent = "Le médecin crée un nouvelle note au sujetd 'un patient.";
     	CreateNoteDto newNote = new CreateNoteDto("4", noteContent);
-    	// java.lang.IllegalArgumentException: 'producer' type is unknown to ReactiveAdapterRegistry
-    	// https://34codefactory.medium.com/spring-5-webclient-and-webtestclient-tutorial-code-factory-84e32978149a
     	
     	// Act & assert
     	webClient.post()
     		.uri("/api/note/patient/{patientUuid}", patient1Uuid)
-    		.body(Mono.just(newNote), CreateNoteDto.class) // attend que le client WebTestClient lui fournisse un flux réactif
+    		.body(Mono.just(newNote), CreateNoteDto.class)
     		.exchange()
     		.expectStatus().isCreated()
-    		.expectBody() //Consume and decode the response body to byte[] and then apply assertions on the raw content (for example, isEmpty, JSONPath
+    		.expectBody() 
     			.jsonPath("$.doctorId").isEqualTo(newNote.doctorId())
     			.jsonPath("$.id").exists()
     			.jsonPath("$.content").isEqualTo(noteContent)
     			.jsonPath("$.createdAt").exists()
     			.jsonPath("$.patientUuid").isEqualTo(patient1Uuid);
 	}
+    
+    @Test
+    void getNotesByPatientUuid_shouldReturnMinimalNotes() {
+        webClient.get()
+            .uri("/api/notes/patient/{patientUuid}", patient1Uuid)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(MinimalNoteDto.class)
+            .consumeWith(response -> {
+                List<MinimalNoteDto> notes = response.getResponseBody();
+                assert notes != null;
+                assert notes.stream().allMatch(n -> n.patientUuid().equals(patient1Uuid));
+            });
+    }
+
+    @Test
+    void getNotesByDoctorId_shouldReturnMinimalNotes() {
+        String doctorId = "4";
+        webClient.get()
+            .uri("/api/notes/doctor/{doctorId}", doctorId)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(new ParameterizedTypeReference<MinimalNoteDto>() {})
+            .consumeWith(response -> {
+                List<MinimalNoteDto> notes = response.getResponseBody();
+                assert notes != null;
+                assert notes.stream().allMatch(n -> n.doctorId().equals(doctorId));
+            });
+    }
+
+    @Test
+    void updateNote_shouldReturnUpdateResultDto() {
+        UpdateNoteDto updateDto = new UpdateNoteDto("Updated content");
+        
+        webClient.patch()
+            .uri("/api/note/{noteId}/update", noteId1)
+            .header("X-Auth-User-Roles", "ROLE_DOCTOR")
+            .header("X-Auth-User-Id", "4")
+            .body(Mono.just(updateDto), UpdateResultDto.class)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.updatedCount").isEqualTo(1)
+            .jsonPath("$.success").isEqualTo(true);
+    }
+
+    @Test
+    void getNotesReportInfo_shouldReturnNotesReportInfo() {
+        webClient.get()
+            .uri("/api/notes/{uuid}/report-info", patient1Uuid)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(NotesReportInfoDto.class)
+            .consumeWith(response -> {
+                List<NotesReportInfoDto> reportInfo = response.getResponseBody();
+                assert reportInfo != null;
+                assert reportInfo.size() > 0;
+            });
+    }
  }
