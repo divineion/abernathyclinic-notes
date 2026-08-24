@@ -1,3 +1,4 @@
+[FR](#microservice-notes) | [EN](#notes-microservice)
 # Microservice Notes
 
 ## Architecture
@@ -6,7 +7,7 @@ Ce microservice fait partie d'une application de gestion de données médicales 
   
 Il s'intègre à l'application avec d'autres microservices :
 
-- [API Gateway](https://github.com/divineion/abernathyclinic-gateway) pour l'authentification et le routage.    
+ - [API Gateway](https://github.com/divineion/abernathyclinic-gateway) pour l'authentification et le routage.    
  - [Microservice Patient](https://github.com/divineion/abernathyclinic-patient) pour la gestion des données démographiques des patients. 
  - [Microservice Report](https://github.com/divineion/abernathyclinic-report) pour l'évaluation du niveau de risque de diabète en croisant les données démographiques et les notes médicales.   
  - [Infrastructure](https://github.com/divineion/abernathyclinic-infra) pour l'orchestration Docker.   
@@ -33,7 +34,7 @@ Les fichiers `application.properties`, `application-dev.properties` et `applicat
 `spring.data.mongodb.database` | Nom de la base de données (profil dev) | `dev_abernathyclinic_notes` 
 
 ## 4. Principaux endpoints
-Les interactions entre les microservices s'appuient sur l'architecture réactive (Reactor Mono et Flux).  
+Les interactions avec les autres microservices s'appuient sur l'architecture réactive (Reactor Mono et Flux).  
 
 GET /api/note/{id} : recherche une note d'observation par son ID MongoDB.   
 GET /api/notes/patient/{patientUuid} : récupère l'historique des notes d'un patient trié par date décroissante.   
@@ -59,8 +60,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 Le profil dev écoute sur le port 8083 et charge automatiquement un jeu de données de test réactif (notes associées à des cas "NONE", "BORDERLINE", "IN DANGER", "EARLY ONSET").   
 
-
-
+[EN](#notes-microservice) | [FR](#microservice-notes)
 # Notes Microservice
 
 ## Architecture
